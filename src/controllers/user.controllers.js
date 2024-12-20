@@ -57,7 +57,7 @@ const login = asynchandler(async(req,res) => {
 })
 
 const logout = asynchandler(async(req,res) => {
-    await User.findById(req.user._id,
+    await User.findByIdAndUpdate(req.user._id,
         {
             $unset: {
                 refreshToken: 1,
@@ -71,11 +71,11 @@ const logout = asynchandler(async(req,res) => {
         httpOnly: true,
         secure: true,
     }
-    return res.status(200
+    return res.status(200)
         .clearCookie("accessToken",options)
         .clearCookie("refreshToken",options)
         .json(new ApiResponse(200,{},"logged out"))
-    )
+    
 })
 
 export {register,login,logout};
