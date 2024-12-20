@@ -4,7 +4,15 @@ import {ApiResponse} from "../utils/ApiResponse.js";
 import { JobDes } from "../models/jobdes.models.js";
 import { User } from "../models/user.models.js";
 
-
+const getJob = asynchandler(async(req,res)=>{
+    const user = await User.findById(req.user._id);
+    const job = await JobDes.findOne({owner: user._id});
+    if(!job)
+        throw new ApiError(402,"Not found");
+    return res.status(201).json(
+        new ApiResponse(201,job,"Success")
+    );
+});
 const setcurrentRole = asynchandler(async(req,res)=>{
     const role = req.body.current;
     const job = await JobDes.findOne({owner: req.user._id});
@@ -44,7 +52,9 @@ const setinterestedRole = asynchandler(async(req,res)=>{
     if(!job){
         throw new ApiError(402,"Please choose current role");
     }
-    job.interested.push(role);
+    for (let index = 0; index < role.length; index++) {
+        job.interested.push(role[index]);
+    }
     const updated = await job.save();
     return res.status(201).json(
         new ApiResponse(201,updated,"Interested role added successfully")
@@ -69,4 +79,4 @@ const removeinterestedRole = asynchandler(async(req,res)=>{
     );
 })
 
-export {setcurrentRole,updatecurrentRole,setinterestedRole,removeinterestedRole};
+export {getJob,setcurrentRole,updatecurrentRole,setinterestedRole,removeinterestedRole};
